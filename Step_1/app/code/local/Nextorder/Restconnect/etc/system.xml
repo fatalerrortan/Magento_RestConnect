@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+
+<config>
+    <tabs>
+        <nextordertab translate="label" module="restconnect">
+            <label>NextOrder Extensions</label>
+            <sort_order>333</sort_order>
+        </nextordertab>
+    </tabs>
+    <sections>
+        <restsection translate="label" module="restconnect">
+            <label>API REST Authentification</label>
+            <tab>nextordertab</tab>
+            <frontend_type>text</frontend_type>
+               <sort_order>1300</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <restgroup_ad translate="label" module="restconnect">
+                    <label>Rest Admin Authentifikation</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <restfield_ad_konto translate="label" module="restconnect">
+                            <label>Auth Konto</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restfield_ad_konto>
+                        <restfield_ad_pw translate="label" module="restconnect">
+                            <label>Auth Passwort</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restfield_ad_pw>
+                        <restfield_ad_check translate="label" module="restconnect">
+                            <label>Einsatz</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>restconnect/admin_system_config_einsatz</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Please use URL http://magentohost.com/restconnect/index/admin{Possible variables} to REST Service for Admin Role]]></comment>
+                        </restfield_ad_check>
+                    </fields>
+                </restgroup_ad>
+                <restgroup_cm translate="label" module="restconnect">
+                    <label>Rest Customer Authentifikation</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <restfield_cm_konto translate="label" module="restconnect">
+                            <label>Auth Konto</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restfield_cm_konto>
+                        <restfield_cm_pw translate="label" module="restconnect">
+                            <label>Auth Passwort</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </restfield_cm_pw>
+                        <restfield_cm_check translate="label" module="restconnect">
+                            <label>Einsatz</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>restconnect/admin_system_config_einsatz</source_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <comment><![CDATA[Please use URL http://magentohost.com/restconnect/index/index{Possible variables} to use REST Service for Customer Role]]></comment>
+                        </restfield_cm_check>
+                    </fields>
+                </restgroup_cm>
+            </groups>
+        </restsection>
+
+        <ordersection>
+            <label>Order Result Config</label>
+            <tab>nextordertab</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>1700</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
+            <groups>
+                <ordergroup_payment translate="label" module="restconnect">
+                    <label>Payment Methode Mapping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>10</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                    <orderfield_payment translate="label" module="restconnect">
+                        <label>Mapping Table</label>
+                        <frontend_type>text</frontend_type>
+                        <sort_order>10</sort_order>
+                        <show_in_default>1</show_in_default>
+                        <show_in_website>1</show_in_website>
+                        <show_in_store>1</show_in_store>
+                        <!-- Block/ -->
+                        <frontend_model>restconnect/adminhtml_system_config_payment</frontend_model>
+                        <!-- Model/ -->
+                        <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                    </orderfield_payment>
+                    </fields>
+                </ordergroup_payment>
+
+                <ordergroup_shipping translate="label" module="restconnect">
+                    <label>Order Priority to Shipping Methode Mapping</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <orderfield_shipping translate="label" module="restconnect">
+                            <label>Mapping Table</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <!-- Block/ -->
+                            <frontend_model>restconnect/adminhtml_system_config_shipping</frontend_model>
+                            <!-- Model/ -->
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                        </orderfield_shipping>
+                    </fields>
+                </ordergroup_shipping>
+
+                <ordergroup_tax translate="label" module="restconnect">
+                    <label>Tax Management for Order Value</label>
+                    <frontend_type>text</frontend_type>
+                    <sort_order>30</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <fields>
+                        <orderfield_tax translate="label" module="restconnect">
+                            <label>Mapping Table</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <!-- Block/ -->
+                            <frontend_model>restconnect/adminhtml_system_config_tax</frontend_model>
+                            <!-- Model/ -->
+                            <backend_model>adminhtml/system_config_backend_serialized_array</backend_model>
+                            <comment>if empty on "Special Tax" and Aktiv on "With Tax", load Default 19%</comment>
+                        </orderfield_tax>
+                    </fields>
+                </ordergroup_tax>
+            </groups>
+        </ordersection>
+    </sections>
+</config>

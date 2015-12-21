@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<config>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <system>
+                        <children>
+                            <config>
+                                <children>
+                                    <restsection translate="title" module="restconnect">
+                                       <title>API REST Config</title>
+                                    </restsection>
+                                    <ordersection translate="title" module="restconnect">
+                                        <title>Order Result Config</title>
+                                    </ordersection>
+                                </children>
+                            </config>
+                        </children>
+                    </system>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>

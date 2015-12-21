@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<config>
+    <modules>
+        <Nextorder_Restconnect>
+            <active>true</active>
+            <codePool>local</codePool>
+        </Nextorder_Restconnect>
+    </modules>
+</config>
