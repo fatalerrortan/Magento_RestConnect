@@ -21,13 +21,11 @@
                 $resultForm='xml';
             }
             $this->customerloginAction();
-            $rootURL = Mage::getUrl();
+            $rootURL = str_replace('index.php/','',Mage::getUrl());
             $params = array(
                 'siteUrl' => $rootURL.'oauth',
                 'requestTokenUrl' => $rootURL.'oauth/initiate',
                 'accessTokenUrl' => $rootURL.'oauth/token',
-                //'authorizeUrl' => 'http://127.0.0.1/magento/admin/oauth_authorize',//This URL is used only if we authenticate as Admin user type
-                //'authorizeUrl' => str_replace( "index.php/", "index.php/admin",Mage::getModel('adminhtml/url')->getUrl('admin/oauth_authorize')),
                 'consumerKey' => $key,//Consumer key registered in server administration
                 'consumerSecret' => $secret,//Consumer secret registered in server administration
                 'callbackUrl' => $rootURL.'restconnect/index/callback?query='.$query.'&form=' .$resultForm.'&key='.$key.'&secret='.$secret,//Url of callback action below
@@ -62,7 +60,7 @@
                 $resultForm='xml';
             }
             $query = $this->getRequest()->getParam('query');
-            $rootURL = Mage::getUrl();
+            $rootURL = str_replace('index.php/','',Mage::getUrl());
             $params = array(
                 'siteUrl' => $rootURL.'oauth',
                 'requestTokenUrl' => $rootURL.'oauth/initiate',
@@ -73,23 +71,23 @@
                 'consumerSecret' => $secret,//Consumer secret registered in server administration
                 'callbackUrl' => $rootURL.'restconnect/index/callback?query='.$query.'&form=' .$resultForm.'&key='.$key.'&secret='.$secret,//Url of callback action below
             );
+//            Zend_Debug::dump($params);
             // Initiate oAuth consumer with above parameters
             $consumer = new Zend_Oauth_Consumer($params);
             // Get request token
             $requestToken = $consumer->getRequestToken();
             $authURL = $consumer->getRedirectUrl();
-
+            //echo $authURL. "<br/>";
             $tmpToken =  substr(strstr($authURL,"oauth_token="),12);
-
+            //echo $tmpToken. "<br/>";
             // Get session
             $session = Mage::getSingleton('core/session');
             // Save serialized request token object in session for later use
             $session->setRequestToken(serialize($requestToken));
 //            $url = $rootURL.'/admin/oauth_authorize/confirm?oauth_token='.$tmpToken;
             $url = $rootURL.'admin/oauth_authorize/confirm?oauth_token='.$tmpToken;
-
+            //echo $url;
             Mage::app()->getFrontController()->getResponse()->setRedirect($url);
-
         }
 
         public function callbackAction() {
@@ -98,8 +96,7 @@
             $resultForm = $this->getRequest()->getParam('form');
             $key = $this->getRequest()->getParam('key');
             $secret = $this->getRequest()->getParam('secret');
-            $rootURL =  Mage::getUrl();
-            //oAuth parameters
+            $rootURL = str_replace('index.php/','',Mage::getUrl());
             $params = array(
                 'siteUrl' => $rootURL.'oauth',
                 'requestTokenUrl' => $rootURL.'oauth/initiate',
@@ -107,33 +104,18 @@
                     'consumerKey' => $key,
                     'consumerSecret' => $secret,
             );
-
-            // Get session
             $session = Mage::getSingleton('core/session');
-            // Read and unserialize request token from session
             $requestToken = unserialize($session->getRequestToken());
-            // Initiate oAuth consumer
             $consumer = new Zend_Oauth_Consumer($params);
-            // Using oAuth parameters and request Token we got, get access token
             $acessToken = $consumer->getAccessToken($_GET, $requestToken);
-            // Get HTTP client from access token object
             $restClient = $acessToken->getHttpClient($params);
-            // Set REST resource URL
-            $restClient->setUri($rootURL.'api/rest/' . $query);
-            // In Magento it is neccesary to set json or xml headers in order to work
+            $restClient->setUri(str_replace('index.php/','',$rootURL).'api/rest/' . $query);
+//            $restClient->setUri('http://127.0.0.1/magento/index.php/api/rest/orders');
             $restClient->setHeaders('Accept', 'application/'.$resultForm);
-//            $restClient->setHeaders('Accept', 'application/json');
-            // Get method
             $restClient->setMethod(Zend_Http_Client::GET);
-            //Make REST request
             $response = $restClient->request();
-            // Here we can see that response body contains json list of products
-            //For Test
-//            file_put_contents("/opt/lampp/htdocs/testOutput.txt", $response);
-
-//            Mage::log($response, null, 'xulin.log');
             Zend_Debug::dump($response);
-        }
+            }
 
         public function customerloginAction(){
 
@@ -174,20 +156,16 @@
 
 //        }
 
-        public function testAction(){
 
-            $test = $this->getRequest()->getPost();
+    public function testAction(){
 
-            Zend_Debug::dump($test);
-        }
+        $accessCheck = $this->getRequest()->getPost();
+        print_r($accessCheck);
 
-        public function test_1Action(){
 
-            $customerGroupID = Mage::getModel('customer/customer')->load(1);
-            print_r($customerGroupID->getData('language'));
-        }
+    }
 
-        public function paymentAction(){
+     public function paymentAction(){
 
             $ActivePaymentMethods = Mage::getModel('payment/config')->getAllMethods();
             foreach ($ActivePaymentMethods as $paymentCode=>$paymentModel) {
