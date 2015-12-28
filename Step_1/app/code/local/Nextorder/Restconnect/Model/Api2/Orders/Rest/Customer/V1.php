@@ -53,8 +53,10 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
 //                Set Data into Collection
             $varienObject = new Varien_Object();
             $varienObject->setData('customerOrder',
-                array('customer' => $this->getChildrenForCustomer($orderOBJ->getData("customer_id")),
-                    'grossTotalOrderValue' => $this->getChildrenForGrossTotalOrderValue($orderOBJ),
+                array(
+//                    Fixing for No Login Order
+//          'customer' => $this->getChildrenForCustomer($orderOBJ->getData("customer_id")),
+//                    'grossTotalOrderValue' => $this->getChildrenForGrossTotalOrderValue($orderOBJ),
                     'CustomerOrderHead' => $this->getChildrenForCustomerOrderHead($orderOBJ),
                     'customerOrderPositions' => $this->getChildrenForcustomerOrderPositions($orderOBJ),
                 )
@@ -77,7 +79,8 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
 //            "customAttributes" => array("originCode" => "!!!!!!!"),
             "creditAssessmentInfo" => "",
             "externalNumber" => "",
-            "number" => $customerOBJ->getData('aleacustomerid'),
+//           To Fixing!!!
+//            "number" => $customerOBJ->getData('aleacustomerid'),
             //noch nicht besetzt
             "originMediumNumber" => "!!!!!!!",
             // Abhängig von KundgruppeNr.(Config Site)
@@ -110,9 +113,9 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
             "standardDeliveryAddress" => $this->getStandardAddress($customer, 'shipping'),
             "contactType" => "",
             //Customer Attribut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            "titleCode" => $customer->getData('titelcode'),
+//            "titleCode" => $customer->getData('titelcode'),
             //Customer Attribut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            "language" => $this->getLanguage($customer),
+//            "language" => $this->getLanguage($customer),
         );
         if(empty($children["vatId"])){
             $children["contactType"] = 1;
@@ -179,20 +182,18 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
         $config = Mage::helper('restconnect/data')->getGroupConfig($customerGroupID);
         if(empty($config)){return $grandTotal;}
         else {
-            if ($config['spec'] == 1) {
-                $newRate = $config['rate'];
-                return ($grandTotal / 1.19) * $newRate;
-            } elseif ($config['spec'] == 0) {
-                return $grandTotal / $config['rate'];
-            }
-        }
+           if ($config['spec'] == 1) {
+               $newRate = $config['rate'];
+               return ($grandTotal / 1.19) * $newRate;
+           } elseif ($config['spec'] == 0) {
+               return $grandTotal / $config['rate'];
+           }
+       }
     }
 
     public function getChildrenForCustomerOrderHead($orderOBJ){
 
         $orderInkreID = $orderOBJ->getIncrementId();
-//        $orderID = $orderOBJ->getId();
-//        $vatTax = $orderOBJ->getData("customer_taxvat");
         $customerGroupID = $orderOBJ->getData("customer_group_id");
         $orderDateTime = $orderOBJ->getData("created_at");
         $status = $orderOBJ->getData("status");
@@ -273,7 +274,7 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
 //                $index++;
             }
         }
-        return $children;
+    return $children;
     }
 
     public function getAddress($orderOBJ,$addressType){
@@ -301,7 +302,7 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
             "countryCode" => $addressForOrder->getData("country_id"),
         );
         return $address;
-    }
+        }
 
     public function getDirectDebit($orderOBJ){
 
@@ -349,13 +350,14 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
                     "batchNumber" => "!!!!!!!",
                     "quantity" => $item->getQtyOrdered(),
 //                    Steuer muss man noch anpassen
-                    "priceDiscountedManually" => $this->getChildrenForGrossTotalOrderValue($orderOBJ, $item->getData('price')),
+//           To Fixing!!!
+//                    "priceDiscountedManually" => $this->getChildrenForGrossTotalOrderValue($orderOBJ, $item->getData('price')),
                     "status" => $item->getStatus(),
 //                    !!!noch nicht besetzt, abhaengig von Sku
                     "mediumNumber" => "!!!!!!!",
 //                  original Produkt schon config
-//                    "positionType" => substr(strstr($product->getAttributeText('sellingtyp'), '_'), 1),
-                    "positionType" => $this->getPostionType($item, $product),
+//           To Fixing!!!
+//                    "positionType" => $this->getPostionType($item, $product),
                 )
             );
         }

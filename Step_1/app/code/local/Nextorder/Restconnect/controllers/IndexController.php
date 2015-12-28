@@ -155,11 +155,60 @@
 //            $adminSession->login($username, $password);
 
 //        }
+    public function indextestAction(){
+//
+//        $accessCheck = $this->getRequest()->getPost();
+//        $postUser = $accessCheck['username'];
+//        $postPw = $accessCheck['password'];
+//        $key = $accessCheck['key'];
+//        $secret = $accessCheck['secret'];
+//        Mage::helper('restconnect/data')->checkPerPost($postUser, $postPw);
+        $query = $this->getRequest()->getParam('query');
+        $resultForm = $this->getRequest()->getParam('form');
+        if(empty($resultForm)){
+            $resultForm='xml';
+        }
+        $this->customerloginAction();
+        $rootURL =  Mage::getUrl();
+        $params = array(
+            'siteUrl' => $rootURL.'oauth',
+            'requestTokenUrl' => $rootURL.'oauth/initiate',
+            'accessTokenUrl' => $rootURL.'oauth/token',
+            'consumerKey' => 'cfc3442b8f5b7b26d409e229bc51dd88',//Consumer key registered in server administration
+            'consumerSecret' => '079b19c1186cc51b626e63b71251408c',//Consumer secret registered in server administration
+            'callbackUrl' => $rootURL.'restconnect/index/callback?query='.$query.'&form=' .$resultForm,//Url of callback action below
+        );
+        // Initiate oAuth consumer with above parameters
+        $consumer = new Zend_Oauth_Consumer($params);
+        // Get request token
+        $requestToken = $consumer->getRequestToken();
+        $authURL = $consumer->getRedirectUrl();
+        //echo $authURL. "<br/>";
+        $tmpToken =  substr(strstr($authURL,"oauth_token="),12);
+        //echo $tmpToken. "<br/>";
+        // Get session
+        $session = Mage::getSingleton('core/session');
+        // Save serialized request token object in session for later use
+        $session->setRequestToken(serialize($requestToken));
+        $url = $rootURL.'oauth/authorize/confirm?oauth_token='.$tmpToken;
+        Mage::app()->getFrontController()->getResponse()->setRedirect($url);
 
+    }
+
+    public function callbacktestAction(){
+
+
+    }
 
     public function testAction(){
 
+            echo Mage::getUrl() ."<br/>";
+            echo "127.0.0.1/"."<br/>";
+            echo str_replace('index.php/','',Mage::getUrl())."<br/>";
+            echo str_replace('index.php/','','127.0.0.1/')."<br/>";
+
         $accessCheck = $this->getRequest()->getPost();
+
         print_r($accessCheck);
 
 
