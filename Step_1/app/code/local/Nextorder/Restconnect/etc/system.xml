@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 
 <config>
-    <tabs>
-        <nextordertab translate="label" module="restconnect">
-            <label>NextOrder Extensions</label>
-            <sort_order>333</sort_order>
-        </nextordertab>
-    </tabs>
+    <!--<tabs>-->
+        <!--<nextordertab translate="label" module="restconnect">-->
+            <!--<label>NextOrder Extensions</label>-->
+            <!--<sort_order>333</sort_order>-->
+        <!--</nextordertab>-->
+    <!--</tabs>-->
     <sections>
         <restsection translate="label" module="restconnect">
             <label>API REST Authentification</label>
-            <tab>nextordertab</tab>
+            <tab>nextorder_extensions</tab>
             <frontend_type>text</frontend_type>
                <sort_order>1300</sort_order>
             <show_in_default>1</show_in_default>
@@ -94,7 +94,7 @@
 
         <ordersection>
             <label>Order Result Config</label>
-            <tab>nextordertab</tab>
+            <tab>nextorder_extensions</tab>
             <frontend_type>text</frontend_type>
             <sort_order>1700</sort_order>
             <show_in_default>1</show_in_default>

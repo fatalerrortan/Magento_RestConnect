@@ -54,7 +54,6 @@
             $postPw = $accessCheck['password'];
             $key = $accessCheck['key'];
             $secret = $accessCheck['secret'];
-//            Mage::helper('restconnect/data')->checkPerPost($postUser, $postPw);
             $resultForm = $this->getRequest()->getParam('form');
             if(empty($resultForm)){
                 $resultForm='xml';
@@ -66,7 +65,6 @@
                 'requestTokenUrl' => $rootURL.'oauth/initiate',
                 'accessTokenUrl' => $rootURL.'oauth/token',
                 'authorizeUrl' => $rootURL.'admin/oauth_authorize',//This URL is used only if we authenticate as Admin user type
-                //'authorizeUrl' => str_replace( "index.php/", "index.php/admin",Mage::getModel('adminhtml/url')->getUrl('admin/oauth_authorize')),
                 'consumerKey' => $key,//Consumer key registered in server administration
                 'consumerSecret' => $secret,//Consumer secret registered in server administration
                 'callbackUrl' => $rootURL.'restconnect/index/callback?query='.$query.'&form=' .$resultForm.'&key='.$key.'&secret='.$secret,//Url of callback action below
@@ -103,6 +101,7 @@
                 'accessTokenUrl' => $rootURL.'oauth/token',
                     'consumerKey' => $key,
                     'consumerSecret' => $secret,
+                    'timeout' => 120,
             );
             $session = Mage::getSingleton('core/session');
             $requestToken = unserialize($session->getRequestToken());
@@ -155,29 +154,22 @@
 //            $adminSession->login($username, $password);
 
 //        }
-    public function indextestAction(){
-//
-//        $accessCheck = $this->getRequest()->getPost();
-//        $postUser = $accessCheck['username'];
-//        $postPw = $accessCheck['password'];
-//        $key = $accessCheck['key'];
-//        $secret = $accessCheck['secret'];
-//        Mage::helper('restconnect/data')->checkPerPost($postUser, $postPw);
-        $query = $this->getRequest()->getParam('query');
-        $resultForm = $this->getRequest()->getParam('form');
-        if(empty($resultForm)){
-            $resultForm='xml';
-        }
-        $this->customerloginAction();
-        $rootURL =  Mage::getUrl();
+
+    public function admintestAction(){
+
+        $key = "cfc3442b8f5b7b26d409e229bc51dd88";
+        $secret = "079b19c1186cc51b626e63b71251408c";
+        $rootURL = str_replace('index.php/','',Mage::getUrl());
         $params = array(
             'siteUrl' => $rootURL.'oauth',
             'requestTokenUrl' => $rootURL.'oauth/initiate',
             'accessTokenUrl' => $rootURL.'oauth/token',
-            'consumerKey' => 'cfc3442b8f5b7b26d409e229bc51dd88',//Consumer key registered in server administration
-            'consumerSecret' => '079b19c1186cc51b626e63b71251408c',//Consumer secret registered in server administration
-            'callbackUrl' => $rootURL.'restconnect/index/callback?query='.$query.'&form=' .$resultForm,//Url of callback action below
+            'authorizeUrl' => $rootURL.'admin/oauth_authorize',//This URL is used only if we authenticate as Admin user type
+            'consumerKey' => $key,//Consumer key registered in server administration
+            'consumerSecret' => $secret,//Consumer secret registered in server administration
+            'callbackUrl' => $rootURL.'restconnect/index/callback',//Url of callback action below
         );
+//            Zend_Debug::dump($params);
         // Initiate oAuth consumer with above parameters
         $consumer = new Zend_Oauth_Consumer($params);
         // Get request token
@@ -190,42 +182,35 @@
         $session = Mage::getSingleton('core/session');
         // Save serialized request token object in session for later use
         $session->setRequestToken(serialize($requestToken));
-        $url = $rootURL.'oauth/authorize/confirm?oauth_token='.$tmpToken;
+//            $url = $rootURL.'/admin/oauth_authorize/confirm?oauth_token='.$tmpToken;
+        $url = $rootURL.'admin/oauth_authorize/confirm?oauth_token='.$tmpToken;
+        //echo $url;
         Mage::app()->getFrontController()->getResponse()->setRedirect($url);
-
     }
 
-    public function callbacktestAction(){
+    public function callbacktestAction() {
 
-
+        $key = "cfc3442b8f5b7b26d409e229bc51dd88";
+        $secret = "079b19c1186cc51b626e63b71251408c";
+        $rootURL = str_replace('index.php/','',Mage::getUrl());
+        $params = array(
+            'siteUrl' => $rootURL.'oauth',
+            'requestTokenUrl' => $rootURL.'oauth/initiate',
+            'accessTokenUrl' => $rootURL.'oauth/token',
+            'consumerKey' => $key,
+            'consumerSecret' => $secret,
+            'timeout' => 120,
+        );
+        $session = Mage::getSingleton('core/session');
+        $requestToken = unserialize($session->getRequestToken());
+        $consumer = new Zend_Oauth_Consumer($params);
+        $acessToken = $consumer->getAccessToken($_GET, $requestToken);
+        $restClient = $acessToken->getHttpClient($params);
+        $restClient->setUri(str_replace('index.php/','',$rootURL).'api/rest/orders' );
+//            $restClient->setUri('http://127.0.0.1/magento/index.php/api/rest/orders');
+        $restClient->setHeaders('Accept', 'application/'.'xml');
+        $restClient->setMethod(Zend_Http_Client::GET);
+        $response = $restClient->request();
+        Zend_Debug::dump($response);
     }
-
-    public function testAction(){
-
-            echo Mage::getUrl() ."<br/>";
-            echo "127.0.0.1/"."<br/>";
-            echo str_replace('index.php/','',Mage::getUrl())."<br/>";
-            echo str_replace('index.php/','','127.0.0.1/')."<br/>";
-
-        $accessCheck = $this->getRequest()->getPost();
-
-        print_r($accessCheck);
-
-
-    }
-
-     public function paymentAction(){
-
-            $ActivePaymentMethods = Mage::getModel('payment/config')->getAllMethods();
-            foreach ($ActivePaymentMethods as $paymentCode=>$paymentModel) {
-
-                $paymentTitle = Mage::getStoreConfig('payment/'.$paymentCode.'/title');
-
-                echo $paymentTitle ."_______________".$paymentCode."<br/>";
-            }
-
-        }
-
-
-
 }
