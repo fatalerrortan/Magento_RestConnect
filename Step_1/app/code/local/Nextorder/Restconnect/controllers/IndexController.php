@@ -101,13 +101,12 @@
                 'accessTokenUrl' => $rootURL.'oauth/token',
                     'consumerKey' => $key,
                     'consumerSecret' => $secret,
-                    'timeout' => 120,
             );
             $session = Mage::getSingleton('core/session');
             $requestToken = unserialize($session->getRequestToken());
             $consumer = new Zend_Oauth_Consumer($params);
             $acessToken = $consumer->getAccessToken($_GET, $requestToken);
-            $restClient = $acessToken->getHttpClient($params);
+            $restClient = $acessToken->getHttpClient($params)->setConfig(array('timeout'=>120));
             $restClient->setUri(str_replace('index.php/','',$rootURL).'api/rest/' . $query);
 //            $restClient->setUri('http://127.0.0.1/magento/index.php/api/rest/orders');
             $restClient->setHeaders('Accept', 'application/'.$resultForm);
@@ -155,62 +154,8 @@
 
 //        }
 
-    public function admintestAction(){
+        public function giltAction(){
 
-        $key = "cfc3442b8f5b7b26d409e229bc51dd88";
-        $secret = "079b19c1186cc51b626e63b71251408c";
-        $rootURL = str_replace('index.php/','',Mage::getUrl());
-        $params = array(
-            'siteUrl' => $rootURL.'oauth',
-            'requestTokenUrl' => $rootURL.'oauth/initiate',
-            'accessTokenUrl' => $rootURL.'oauth/token',
-            'authorizeUrl' => $rootURL.'admin/oauth_authorize',//This URL is used only if we authenticate as Admin user type
-            'consumerKey' => $key,//Consumer key registered in server administration
-            'consumerSecret' => $secret,//Consumer secret registered in server administration
-            'callbackUrl' => $rootURL.'restconnect/index/callback',//Url of callback action below
-        );
-//            Zend_Debug::dump($params);
-        // Initiate oAuth consumer with above parameters
-        $consumer = new Zend_Oauth_Consumer($params);
-        // Get request token
-        $requestToken = $consumer->getRequestToken();
-        $authURL = $consumer->getRedirectUrl();
-        //echo $authURL. "<br/>";
-        $tmpToken =  substr(strstr($authURL,"oauth_token="),12);
-        //echo $tmpToken. "<br/>";
-        // Get session
-        $session = Mage::getSingleton('core/session');
-        // Save serialized request token object in session for later use
-        $session->setRequestToken(serialize($requestToken));
-//            $url = $rootURL.'/admin/oauth_authorize/confirm?oauth_token='.$tmpToken;
-        $url = $rootURL.'admin/oauth_authorize/confirm?oauth_token='.$tmpToken;
-        //echo $url;
-        Mage::app()->getFrontController()->getResponse()->setRedirect($url);
-    }
-
-    public function callbacktestAction() {
-
-        $key = "cfc3442b8f5b7b26d409e229bc51dd88";
-        $secret = "079b19c1186cc51b626e63b71251408c";
-        $rootURL = str_replace('index.php/','',Mage::getUrl());
-        $params = array(
-            'siteUrl' => $rootURL.'oauth',
-            'requestTokenUrl' => $rootURL.'oauth/initiate',
-            'accessTokenUrl' => $rootURL.'oauth/token',
-            'consumerKey' => $key,
-            'consumerSecret' => $secret,
-            'timeout' => 120,
-        );
-        $session = Mage::getSingleton('core/session');
-        $requestToken = unserialize($session->getRequestToken());
-        $consumer = new Zend_Oauth_Consumer($params);
-        $acessToken = $consumer->getAccessToken($_GET, $requestToken);
-        $restClient = $acessToken->getHttpClient($params);
-        $restClient->setUri(str_replace('index.php/','',$rootURL).'api/rest/orders' );
-//            $restClient->setUri('http://127.0.0.1/magento/index.php/api/rest/orders');
-        $restClient->setHeaders('Accept', 'application/'.'xml');
-        $restClient->setMethod(Zend_Http_Client::GET);
-        $response = $restClient->request();
-        Zend_Debug::dump($response);
-    }
+            echo "it is working!";
+        }
 }

@@ -25,7 +25,7 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
         $collection = $this->getCustomerCollection();
         if($orderID == 'all'){
             return $collection;
-        }elseif($orderID == (int)$orderID){
+        }elseif($orderID == $orderID){
             $collection_item = new Varien_Data_Collection();
             $varienObject = new Varien_Object();
             foreach($collection as $item){
