@@ -53,50 +53,50 @@
                         </restfield_ad_check>
                     </fields>
                 </restgroup_ad>
-                <restgroup_cm translate="label" module="restconnect">
-                    <label>Rest Customer Authentifikation</label>
-                    <frontend_type>text</frontend_type>
-                    <sort_order>10</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <restfield_cm_konto translate="label" module="restconnect">
-                            <label>Auth Konto</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </restfield_cm_konto>
-                        <restfield_cm_pw translate="label" module="restconnect">
-                            <label>Auth Passwort</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </restfield_cm_pw>
-                        <restfield_cm_check translate="label" module="restconnect">
-                            <label>Einsatz</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>restconnect/admin_system_config_einsatz</source_model>
-                            <sort_order>30</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                            <comment><![CDATA[Please use URL http://magentohost.com/restconnect/index/index{Possible variables} to use REST Service for Customer Role]]></comment>
-                        </restfield_cm_check>
-                    </fields>
-                </restgroup_cm>
+                <!--<restgroup_cm translate="label" module="restconnect">-->
+                    <!--<label>Rest Customer Authentifikation</label>-->
+                    <!--<frontend_type>text</frontend_type>-->
+                    <!--<sort_order>10</sort_order>-->
+                    <!--<show_in_default>1</show_in_default>-->
+                    <!--<show_in_website>1</show_in_website>-->
+                    <!--<show_in_store>1</show_in_store>-->
+                    <!--<fields>-->
+                        <!--<restfield_cm_konto translate="label" module="restconnect">-->
+                            <!--<label>Auth Konto</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<sort_order>10</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                        <!--</restfield_cm_konto>-->
+                        <!--<restfield_cm_pw translate="label" module="restconnect">-->
+                            <!--<label>Auth Passwort</label>-->
+                            <!--<frontend_type>text</frontend_type>-->
+                            <!--<sort_order>20</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                        <!--</restfield_cm_pw>-->
+                        <!--<restfield_cm_check translate="label" module="restconnect">-->
+                            <!--<label>Einsatz</label>-->
+                            <!--<frontend_type>select</frontend_type>-->
+                            <!--<source_model>restconnect/admin_system_config_einsatz</source_model>-->
+                            <!--<sort_order>30</sort_order>-->
+                            <!--<show_in_default>1</show_in_default>-->
+                            <!--<show_in_website>1</show_in_website>-->
+                            <!--<show_in_store>1</show_in_store>-->
+                            <!--<comment><![CDATA[Please use URL http://magentohost.com/restconnect/index/index{Possible variables} to use REST Service for Customer Role]]></comment>-->
+                        <!--</restfield_cm_check>-->
+                    <!--</fields>-->
+                <!--</restgroup_cm>-->
             </groups>
         </restsection>
 
         <ordersection>
-            <label>Order Result Config</label>
+            <label>Order Result Config For REST</label>
             <tab>nextorder_extensions</tab>
             <frontend_type>text</frontend_type>
-            <sort_order>1700</sort_order>
+            <sort_order>1301</sort_order>
             <show_in_default>1</show_in_default>
             <show_in_website>1</show_in_website>
             <show_in_store>1</show_in_store>

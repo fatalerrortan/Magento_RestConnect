@@ -1,118 +1,83 @@
 <?php
-///**
-// * Created by PhpStorm.
-// * User: tiemanntan
-// * Date: 18/11/15
-// * Time: 22:18
-// */
-//
 class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Model_Resource{
 
     public function _retrieve(){
-        //retrieve a Order name by Order_ID4
 
         $orderID = $this->getRequest()->getParam('orderID');
-//        $orderInstanz = Mage::getModel('sales/order')->loadByIncrementId($orderID);
-//        $order = $this->getCustomerCollection($orderID);
-//print_r($this->_retrieveCollection());
         return $orderID;
-
     }
 
     public function _retrieveCollection(){
 
-        $orderID = $this->getRequest()->getParam('orderID');
-        $collection = $this->getCustomerCollection();
-        if($orderID == 'all'){
-            return $collection;
-        }elseif($orderID == $orderID){
-            $collection_item = new Varien_Data_Collection();
-            $varienObject = new Varien_Object();
-            foreach($collection as $item){
-                $itemArray = $item->toArray();
-                $orderID_API = $itemArray['customerOrder']['CustomerOrderHead']['number'];
-                if($orderID == $orderID_API){
-                    $varienObject->setData('customerOrder', $itemArray['customerOrder']);
-                    $collection_item->addItem($varienObject);
-                    return $collection_item;
-                }
-            }
-        }
-
+        $orderID = str_replace('ph','%',$this->getRequest()->getParam('orderID'));
+        $collection = $this->getCustomerCollection($orderID);
+        return $collection;
     }
 
-    public function getCustomerCollection(){
+    public function getCustomerCollection($orderQuery){
 
         $collection = new Varien_Data_Collection();
-        $collectionForOrders = Mage::getModel('sales/order')->getCollection();
-        foreach($collectionForOrders as $orderOBJ){
-
-            $varienObject = new Varien_Object();
-            $varienObject->setData('customerOrder',
-                array(
-//                    Fixing for No Login Order
-                    'customer' => empty($orderOBJ->getData("customer_id")) ? "" : $this->getChildrenForCustomer($orderOBJ->getData("customer_id")),
-                    'grossTotalOrderValue' => $this->getChildrenForGrossTotalOrderValue($orderOBJ),
-                    'CustomerOrderHead' => $this->getChildrenForCustomerOrderHead($orderOBJ),
-                    'customerOrderPositions' => $this->getChildrenForcustomerOrderPositions($orderOBJ),
-                )
-            );
-            $collection->addItem($varienObject);
+        if($orderQuery == 'all'){
+            $collectionForOrders = Mage::getModel('sales/order')->getCollection()
+                                    ->addFieldToSelect('*')->addAttributeToFilter('increment_id', array('like' => '%-%-%'));
+        }else{
+            $collectionForOrders = Mage::getModel('sales/order')->getCollection()
+                ->addFieldToSelect('*')->addAttributeToFilter('increment_id', array('like' => $orderQuery));
         }
-        return $collection;
+        foreach($collectionForOrders as $orderOBJ){
+        $varienObject = new Varien_Object();
+        $varienObject->setData('customerOrder',
+        array(
+            'customer' => empty($orderOBJ->getData("customer_id")) ? "" : $this->getChildrenForCustomer($orderOBJ->getData("customer_id")),
+            'grossTotalOrderValue' => $this->getChildrenForGrossTotalOrderValue($orderOBJ),
+            'CustomerOrderHead' => $this->getChildrenForCustomerOrderHead($orderOBJ),
+            'customerOrderPositions' => $this->getChildrenForcustomerOrderPositions($orderOBJ),
+            ));
+        $collection->addItem($varienObject);
+            Mage::log("laufen bis: ".$orderOBJ->getIncrementId(), null, 'restConnect.log');
+        }
+    return $collection;
     }
 
     public function getChildrenForCustomer($customerID){
 
         $customerOBJ= Mage::getModel('customer/customer')->load($customerID);
         $customer = array(
-//            //noch nicht besetzt(1. Order als Default)(Config site)
 //            "defaultPaymentMethodType" => $this->getDefaultPayment($customerID),
-            //noch nicht besetzt
 //            "customAttributes" => array("originCode" => "!!!!!!!"),
-            "creditAssessmentInfo" => "",
-            "externalNumber" => "",
-//           To Fixing!!!
-//            "number" => $customerOBJ->getData('aleacustomerid'),
-            //noch nicht besetzt
-            "originMediumNumber" => "",
-            // Abhängig von KundgruppeNr.(Config Site)
-            "exemptFromVat" => "",
-            //noch nicht besetzt
-            "originMediumTargetGroupNumber" => "",
-            "person" => $this->getPerson($customerOBJ)
-        );
-        $groupID = $customerOBJ->getData('group_id');
-        $exempt = Mage::helper('restconnect/data')->getGroupConfig($groupID);
-        if($exempt['exempt'] == 1){
-            $customer['exemptFromVat'] = "true";
-        }else{
-            $customer['exemptFromVat'] = "false";
-        }
-
+                "creditAssessmentInfo" => "",
+                "externalNumber" => "",
+                //"number" => $customerOBJ->getData('aleacustomerid'),
+                "originMediumNumber" => "",
+                "exemptFromVat" => "",
+                "originMediumTargetGroupNumber" => "",
+                "person" => $this->getPerson($customerOBJ)
+                    );
+                $groupID = $customerOBJ->getData('group_id');
+                $exempt = Mage::helper('restconnect/data')->getGroupConfig($groupID);
+                if($exempt['tax'] == 0){
+                    $customer['exemptFromVat'] = "true";
+                }else{
+                    $customer['exemptFromVat'] = "false";
+                }
 
         return $customer;
     }
 
-//    public function getDefaultPayment($customerID){}
-
     public function getPerson($customer){
-//        Mage::log("Result: ".$customer->getPrimaryBillingAddress()->getData('lastname') , null, 'xulin.log');
 
-//        $customer= Mage::getModel('customer/customer')->load($customerid);
-//        Mage::log("Result: ".$customer->getPrimaryBillingAddress()->getData('lastname') , null, 'xulin.log');
-        $children =array(
-            "birthday" => $customer->getData("dob"),
-            "emailPriv1" => $customer->getData("email"),
-            "vatId" => $customer->getData("taxvat"),
-            "standardInvoiceAddress" => $this->getStandardAddress($customer,'billing'),
-            "standardDeliveryAddress" => $this->getStandardAddress($customer, 'shipping'),
-            "contactType" => "",
-            //Customer Attribut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    $children =array(
+        "birthday" => $customer->getData("dob"),
+        "email" => $customer->getData("email"),
+        "vatId" => $customer->getData("taxvat"),
+        "standardInvoiceAddress" => $this->getStandardAddress($customer,'billing'),
+        "standardDeliveryAddress" => $this->getStandardAddress($customer, 'shipping'),
+        "contactType" => "",
+//Customer Attribut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //            "titleCode" => $customer->getData('titelcode'),
-            //Customer Attribut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//Customer Attribut !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //            "language" => $this->getLanguage($customer),
-        );
+);
         if(empty($children["vatId"])){
             $children["contactType"] = 1;
         }
@@ -123,22 +88,7 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
         return $children;
     }
 
-    public function getLanguage($customer){
-
-        $languageCode = $customer->getData('language');
-        if($languageCode == 8){
-            return 'Franzoesich';
-        }
-        elseif($languageCode == 7){
-            return "Englisch";
-        }
-        elseif($languageCode == 9){
-            return "Italienisch";
-        }
-        else{
-            return "Deutsch";
-        }
-    }
+//    public function getLanguage($customer){}
 
     public function getStandardAddress($customer, $addressType){
 
@@ -165,39 +115,26 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
             "mobilePriv1" => $addressForDefault->getData('telephone'),
             "phonePriv1" => $addressForDefault->getData('fax'),
             "vatId" => $addressForDefault->getData('vat_id')
-        );
+            );
+
         return $address;
-
-    }
-    public function getChildrenForGrossTotalOrderValue($orderOBJ, $singlePrice = false){
-
-        if($singlePrice != false){
-            $grandTotal = $singlePrice;
-        }else {
-            $grandTotal = $orderOBJ->getData('grand_total');
         }
 
-        if(empty($orderOBJ->getData('customer_id'))){$customerGroupID = 0;}
-        else{$customerGroupID = Mage::getModel('customer/customer')->load($orderOBJ->getData('customer_id'))->getData('group_id');}
+        public function getChildrenForGrossTotalOrderValue($orderOBJ, $singlePrice = false){
 
-        $config = Mage::helper('restconnect/data')->getGroupConfig($customerGroupID);
-        if(empty($config)){return $grandTotal;}
-        else {
-           if ($config['spec'] == 1) {
-               $newRate = $config['rate'];
-               return ($grandTotal / 1.19) * $newRate;
-           } elseif ($config['spec'] == 0) {
-               return $grandTotal / $config['rate'];
-           }
-       }
-
-        return $grandTotal;
-    }
+            if(empty($orderOBJ->getData('customer_id'))){$customerGroupID = 0;}
+            else{$customerGroupID = Mage::getModel('customer/customer')->load($orderOBJ->getData('customer_id'))->getData('group_id');}
+            $config = Mage::helper('restconnect/data')->getGroupConfig($customerGroupID);
+            $grandTotal = $orderOBJ->getData('grand_total');
+            $tax = $orderOBJ->getData('tax_amount');
+            if($config['tax'] == 1){return  $grandTotal;}
+            if($config['tax'] == 0){return  $grandTotal - $tax;}
+            if($config['tax'] == 2){return ($grandTotal - $tax) * (1 + $config['rate']/100);}
+        }
 
     public function getChildrenForCustomerOrderHead($orderOBJ){
 
         $orderInkreID = $orderOBJ->getIncrementId();
-//        Mage::log("Result: ". $orderInkreID, null, 'xulin.log');
         $customerGroupID = $orderOBJ->getData("customer_group_id");
         $orderDateTime = $orderOBJ->getData("created_at");
         $status = $orderOBJ->getData("status");
@@ -207,7 +144,6 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
 //            "targetGroupNumber" => $customerGroupID,
             "shopCustomerGroupID" => $customerGroupID,
             "orderDateTime" => $orderDateTime,
-//            for Mapping (admin config)
             "paymentMethodType" => $this->getPaymentCode($orderOBJ),
             "invoiceToDeliveryAdress" => "",
             "invoiceAddress" => $this->getAddress($orderOBJ, "billing"),
@@ -217,25 +153,24 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
             "shippingService" => $this->getShippingService($orderOBJ),
             "slivered" => "",
             "orderType" => $this->getOrderType($orderOBJ),
-//            "advancePaymentNotificationSend" => $this->getAdvancePaymentNotificationSend($orderOBJ),
-            "mediumNumber" => "!!!!!!!",
+            "mediumNumber" => "",
             //abhängig von Transportsmethoden (Admin config)
             "priority" => $this->getShippingService($orderOBJ, true),
             //if Vorkasse,  gibt AccountingKey an, sonst nicht!!!
             "paidPrepayment" => array("accountingKey" => $this->getPaymentCode($orderOBJ, true)),
-        );
-        if($children["invoiceAddress"] == $children["deliveryAddress"]){
-            $children["invoiceToDeliveryAdress"] = 'yes';
-        }
-        else{
-            $children["invoiceToDeliveryAdress"] = 'no';
-        }
-        if($children["status"] == "closed"){
-            $children["slivered"] = "true";
-        }
-        else{
-            $children["slivered"] = "false";
-        }
+            );
+            if($children["invoiceAddress"] == $children["deliveryAddress"]){
+                $children["invoiceToDeliveryAdress"] = 1;
+                }
+            else{
+                $children["invoiceToDeliveryAdress"] = 0;
+                }
+            if($children["status"] == "closed"){
+                $children["slivered"] = 1;
+                }
+            else{
+                $children["slivered"] = 0;
+                }
 
         return $children;
     }
@@ -243,42 +178,43 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
     public function getShippingService($orderOBJ, $requirePriority = false){
 
         if($requirePriority == true){
+
             $shippingCode = $orderOBJ->getTracksCollection()->getFirstItem()->getData('carrier_code');
             $priority = Mage::helper('restconnect/data')->getPriority($shippingCode);
+
             return $priority;
-        }
-        else {
-            return $orderOBJ->getTracksCollection()->getFirstItem()->getTitle();
+        }else {
+
+                return $orderOBJ->getTracksCollection()->getFirstItem()->getTitle();
         }
     }
 
     public function getPaymentCode($orderOBJ, $requireAccoutingKey = false){
-
 //        $payment_title = $orderOBJ->getPayment()->getMethodInstance()->getTitle();
         $payment_code = $orderOBJ->getPayment()->getMethodInstance()->getCode();
         if($requireAccoutingKey == true){
             $dataResult = Mage::helper('restconnect/data')->getConfigPaymentCode($payment_code, true);
-        }
-        else {
+        } else {
             $dataResult = Mage::helper('restconnect/data')->getConfigPaymentCode($payment_code);
         }
+
         return $dataResult;
     }
 
     public function getNotice($orderOBJ){
-//        $notice = array();
+
         $comments = $orderOBJ->getStatusHistoryCollection(true);
-//        $index = 1;
         $children = array();
         foreach ($comments as $comment) {
             if(!empty($comment->getComment())){
-//                $notice['notice'.$index] = str_replace( html_entity_decode('&#xA0;&#x20AC;', ENT_COMPAT, 'UTF-8'), ' Euro',substr(strstr($comment->getComment(),'}}{{',true),3,100)) ." Created at ".$comment->getCreatedAt();
+            //                $notice['notice'.$index] = str_replace( html_entity_decode('&#xA0;&#x20AC;', ENT_COMPAT, 'UTF-8'), ' Euro',substr(strstr($comment->getComment(),'}}{{',true),3,100)) ." Created at ".$comment->getCreatedAt();
 //                  $notice['notice_'.$index] = html_entity_decode(substr(strstr($comment->getComment(),'}}{{',true),3,100) ." Created at ".$comment->getCreatedAt());
                 $children[] = array('notice' => $comment->getComment().  ", Created at ".$comment->getCreatedAt());
-//                $index++;
+//                $index++\
             }
         }
-    return $children;
+
+        return $children;
     }
 
     public function getAddress($orderOBJ,$addressType){
@@ -290,7 +226,6 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
         elseif($addressType == "shipping"){
             $shippingId = $orderOBJ->getShippingAddress()->getId();
             $addressForOrder = Mage::getModel('sales/order_address')->load($shippingId);
-
         }
         $address = array(
             "name" => $addressForOrder->getData("lastname"),
@@ -305,18 +240,19 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
             "zipCode" => $addressForOrder->getData("postcode"),
             "countryCode" => $addressForOrder->getData("country_id"),
         );
+
         return $address;
-        }
+    }
 
     public function getDirectDebit($orderOBJ){
 
         $customerId = $orderOBJ->getData('customer_id');
         $customer = Mage::getModel('customer/customer')->load($customerId);
         $directDebit = array(
-            "accountNumber" => substr($customer->getData('iban'),12,10),
+            "accountNumber" => substr($customer->getData('debit_payment_account_iban'),12,10),
             "accountHolder" => $customer->getData('firstname')." ".$customer->getData('lastname'),
-            "bankCode" =>substr($customer->getData('iban'),4,8),
-            "IBAN" => $customer->getData('iban')
+            "bankCode" =>substr($customer->getData('debit_payment_account_iban'),4,8),
+            "IBAN" => $customer->getData('debit_payment_account_iban')
         );
 
         return $directDebit;
@@ -327,60 +263,54 @@ class Nextorder_Restconnect_Model_Api2_Orders_Rest_Admin_V1 extends Mage_Api2_Mo
         $items = $orderOBJ->getAllItems();
         if(count($items)>1){
             return "Multi Bestellung(" . count($items) . " Produktarten)";
-        }
-        else{
+        } else{
             return "Einzele Bestellung";
         }
     }
+
     public function getAdvancePaymentNotificationSend($orderOBJ){
 
         $notified = $orderOBJ->getStatusHistoryCollection(true)->getData('is_customer_notified')[0]['is_customer_notified'];
         return $notified;
-    }
+}
 
     public function getChildrenForcustomerOrderPositions($orderOBJ){
-        Mage::log("Result: ".$orderOBJ->getIncrementId() , null, 'xulin.log');
 
         $items = $orderOBJ->getAllItems();
         //        customerOrderPosition
         foreach($items as $item){
-//            $product = Mage::getModel('catalog/product')->loadByAttribute('sku', $item->getSku());
-            $children[] = array(
-                "customerOrderPosition" => array(
-                    "positionNumber" => $item->getId(),
-//                    "description" => $product->getdata('description'),
-                    "mediumArticleNumber" => $item->getSku(),
-//                    in Frage
-                    "batchNumber" => "!!!!!!!",
-                    "quantity" => $item->getQtyOrdered(),
-//                    Steuer muss man noch anpassen
-//           To Fixing!!!
-                    "priceDiscountedManually" => $this->getChildrenForGrossTotalOrderValue($orderOBJ, $item->getData('price')),
-                    "status" => $item->getStatus(),
-//                    !!!noch nicht besetzt, abhaengig von Sku
-//                    "mediumNumber" => "!!!!!!!",
-//                  original Produkt schon config
+        $children[] = array(
+            "customerOrderPosition" => array(
+            "positionNumber" => $item->getId(),
+                "description" => $this->getDescription($item->getSku()),
+            "mediumArticleNumber" => $item->getSku(),
+            //"batchNumber" => "!!!!!!!",
+            "quantity" => $item->getQtyOrdered(),
+            "unitPreisWithoutTax" =>  $item->getData('price'),
+            "status" => $item->getStatus(),
 //           To Fixing!!!
 //                    "positionType" => $this->getPostionType($item, $product),
                 )
             );
         }
+
         return $children;
+    }
+
+    public function getDescription($sku){
+
+       return Mage::getModel('catalog/product')->load(677)->getData('description');
     }
 
     public function getPostionType($item, $product){
 
         if($item->getPrice() == $product->getPrice() && $item->getPrice() != 0){
-
-            return substr(strstr($product->getAttributeText('sellingtyp'), '_'), 1);
-        }
-        elseif(substr(strstr($product->getAttributeText('sellingtyp'), '_'), 1) == 1){
-
-            return 107;
-        }
-        else{
-            return substr(strstr($product->getAttributeText('sellingtyp'), '_'), 1);
+        return substr(strstr($product->getAttributeText('sellingtyp'), '_'), 1);
+        } elseif(substr(strstr($product->getAttributeText('sellingtyp'), '_'), 1) == 1){
+        return 107;
+        } else{
+        return substr(strstr($product->getAttributeText('sellingtyp'), '_'), 1);
         }
     }
-
 }
+?>

@@ -157,12 +157,13 @@
 						if ($config_param['customergroup'] == $customerGroupID) {
 
 							if ($config_param['taxcheck'] == 0) {
-								return array('spec' => 0, 'rate' => 1.19, 'exempt' => 1);
-							} elseif (empty($config_param['taxrate'])) {
-								return array('spec' => 0, 'rate' => 1, 'exempt' => 0);
-							} else {
-								$newRate = 1 + ($config_param['taxrate'] / 100);
-								return array('spec' => 1, 'rate' => $newRate, 'exempt' => 0);
+								return array('tax' => 0);
+							}else{
+								if(empty($config_param['taxrate'])){
+									return array('tax' => 1);
+								}else{
+									return array('tax' =>2, 'rate'=> $config_param['taxrate']);
+								}
 							}
 						}
 					}

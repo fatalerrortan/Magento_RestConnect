@@ -112,8 +112,10 @@
             $restClient->setHeaders('Accept', 'application/'.$resultForm);
             $restClient->setMethod(Zend_Http_Client::GET);
             $response = $restClient->request();
-            Zend_Debug::dump($response);
-            }
+//            Zend_Debug::dump($response);
+//            Mage::log($response, null, 'restConnect.log');
+            echo $response;
+        }
 
         public function customerloginAction(){
 
