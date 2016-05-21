@@ -1,25 +1,25 @@
-Anwendbarkeit
-1 Konfiguration im Admin
+Anleitung
 
-Bitte konfigurieren Sie zuerst Konten zur REST-Authentifikaton im Konfigurationsbereich: Admin-> System -> Configuration -> Nextorder Extensions(API REST Config) und stellen eine der gewünschten Rollen(Admin oder Customer) zum Einsatz stellen.
-2 REST-Request stellen über diese Extension Nextorder_Restconnect => IndexController => index- oder customerAction()
+* Konfiguration für die Aktivierbarkeit und den Zugang zur Benutzung REST API
+ 
+ - Admin -> System -> Konfiguration -> Nextorder Extensions(API REST Authentification)
 
-REST-Request per Customer Rolle: http://www.magento-host.com/restconnect/index/index{mögliche Parameter}
-REST-Request per Admin Rolle: http://www.magento-host.com/restconnect/index/admin{mögliche Parameter}
-3 Ressouce Lokalisierung und Ausgabenformat über Parameter "query" und "form" per HTTP-GET
+* Konfiguration für die dynamischen Einträge wie (Steuer, ERP Payment Code, Accounting Key und Priorität der Zahlungsmethoden)
 
-Beispiel: Ziel Ressource => Bestellung, Ziel Format => XML
-http://www.magento-host.com/restconnect/index/{index oder admin}?query=order&format=xml
+ - Admin -> System -> Konfiguration -> Nextorder Extensions(Order Result Config For REST)
 
-Beispiel: Ziel Ressource => Bestellung ID = 3, Ziel Format => Json
-http://www.magento-host.com/restconnect/index/{index oder admin}?query=orders/5/items&format=json
+* Base REST API URL  www.domain.com/restconnect/index/admin
 
-Beispiel: Ziel Ressource => Kunden, Ziel Format => Json (wenn keine Angabe zur Format => Default XML)
-http://www.magento-host.com/restconnect/index/{index oder admin}?query=customers&format=json
+ - API KEY und SECRET über POST implizit angeben.  Bitte nehmen Sie Parameternamen !"key" und "secret"!, sonst geht es nicht!
+ 
+ - API Query und Result Form über GET explizit angeben => www.domain.com/restconnect/index/admin?query={...}&form={...}
 
-Alle zugreifbare Werte und original vordefinierte Syntax zu verschiedenen REST-Ressourcen für den Parameter "query" sehen sie http://devdocs.magento.com/guides/m1x/api/rest/introduction.html
+ - Query Syntax:
 
-Nehmen Sie an! Der originale REST URL: http://magento-host/api/rest/{Params} = Unsere Extension: http://www.magento-host.com/restconnect/index/{index oder admin}?query={Params}&form={xml oder json}
-4 Request muss über HTTP-POST gestellt werden
+  - Für alle Bestellungen => www.domain.com/restconnect/index/admin?query=nextorder/orders/all/item
 
-Dabei muss man zwei Parameter "username" und "password" an die Extension per POST Methode implizit übertragen, um die Bereichtigung des Benutzers zu kontrollieren.
+  - Für einzelne Bestellung z.B. Bestellung 1388-16-105 => www.domain.com/restconnect/index/admin?query=nextorder/orders/1388-16-105/item
+
+  - Für Match Scuhe Bitte nutzen Sie "pd" als Placeholder-Zeichen. z.B. Geben alle Bestellung, die mit 13 anfangen und im Jahr 2016 generiert werden, an => www.domain.com/restconnect/index/admin?query=nextorder/orders/13pd-16-105/item.
+
+* restConnect.log protokolliert ganz Verfahren.
