@@ -1,4 +1,4 @@
-Anleitung
+<h1>Anleitung</h1>
 
 * Konfiguration für die Aktivierbarkeit und den Zugang zur Benutzung REST API
  
@@ -20,6 +20,14 @@ Anleitung
 
   - Für einzelne Bestellung z.B. Bestellung 1388-16-105 => www.domain.com/restconnect/index/admin?query=nextorder/orders/1388-16-105/item
 
-  - Für Match Scuhe Bitte nutzen Sie "pd" als Placeholder-Zeichen. z.B. Geben alle Bestellung, die mit 13 anfangen und im Jahr 2016 generiert werden, an => www.domain.com/restconnect/index/admin?query=nextorder/orders/13pd-16-105/item.
+  - Für Match Bitte nutzen Sie "pd" als Placeholder-Zeichen. z.B. Geben alle Bestellung, die mit 13 anfangen und im Jahr 2016 generiert werden, an => www.domain.com/restconnect/index/admin?query=nextorder/orders/13pd-16-105/item.
 
-* restConnect.log protokolliert ganz Verfahren.
+* restConnect.log protokolliert komplette Operationsspuren.
+
+<h3>Access Control customer or admin Authentification</h3>
+
+![alt text](http://www.xulin-tan.com/demo/Access.png)
+
+<h3>API output configuation for german market</h3>
+
+![alt text](http://www.xulin-tan.com/demo/output.png)
